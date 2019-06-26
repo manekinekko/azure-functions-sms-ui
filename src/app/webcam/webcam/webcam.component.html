@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <div mat-card-avatar>
+      <img width="40" src="assets/azure.png" alt="" />
+    </div>
+    <mat-card-title>Azure</mat-card-title>
+    <mat-card-subtitle>Use Azure Functions to extract data from an image.</mat-card-subtitle>
+  </mat-card-header>
+
+  <webcam
+    mat-card-image
+    [height]="500"
+    [width]="500"
+    [trigger]="triggerObservable"
+    (imageCapture)="handleImage($event)"
+    *ngIf="showWebcam && !webcamImage"
+    [allowCameraSwitch]="allowCameraSwitch"
+    [switchCamera]="nextWebcamObservable"
+    [videoOptions]="videoOptions"
+    [imageQuality]="1"
+    (cameraSwitched)="cameraWasSwitched($event)"
+    (initError)="handleInitError($event)"
+  ></webcam>
+
+  <img mat-card-image *ngIf="webcamImage" [src]="webcamImage.imageAsDataUrl" />
+
+  <mat-card-content>
+    <ul *ngFor="let error of errors">
+      <li>{{ error | json }}</li>
+    </ul>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button *ngIf="!webcamImage" (click)="triggerSnapshot();">CAPTURE</button>
+    <button mat-button *ngIf="webcamImage" (click)="toggleWebcam();">TRY AGAIN</button>
+    <button [disabled]="!webcamImage" mat-button>PROCESS</button>
+  </mat-card-actions>
+</mat-card>
