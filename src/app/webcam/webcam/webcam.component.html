@@ -32,6 +32,6 @@
   <mat-card-actions>
     <button mat-button *ngIf="!webcamImage" (click)="triggerSnapshot();">CAPTURE</button>
     <button mat-button *ngIf="webcamImage" (click)="toggleWebcam();">TRY AGAIN</button>
-    <button [disabled]="!webcamImage" mat-button>PROCESS</button>
+    <button mat-button [disabled]="!webcamImage" (click)="process();">PROCESS</button>
   </mat-card-actions>
 </mat-card>

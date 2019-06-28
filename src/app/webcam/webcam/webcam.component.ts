@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import {WebcamImage, WebcamInitError, WebcamUtil} from 'ngx-webcam';
-import { Subject, Observable } from 'rxjs';
+import { WebcamImage, WebcamInitError, WebcamUtil } from "ngx-webcam";
+import { Subject, Observable } from "rxjs";
+import { StorageService } from "src/app/azure/storage.service";
 
 @Component({
   selector: "app-webcam",
@@ -14,8 +15,8 @@ export class WebcamComponent implements OnInit {
   public multipleWebcamsAvailable = false;
   public deviceId: string;
   public videoOptions: MediaTrackConstraints = {
-    width: {ideal: 1024},
-    height: {ideal: 576}
+    width: { ideal: 1024 },
+    height: { ideal: 576 }
   };
   public errors: WebcamInitError[] = [];
 
@@ -29,6 +30,8 @@ export class WebcamComponent implements OnInit {
   private nextWebcam: Subject<boolean | string> = new Subject<
     boolean | string
   >();
+
+  constructor(private readonly azureStorage: StorageService) {}
 
   public ngOnInit(): void {
     WebcamUtil.getAvailableVideoInputs().then(
@@ -78,5 +81,21 @@ export class WebcamComponent implements OnInit {
 
   public get nextWebcamObservable(): Observable<boolean | string> {
     return this.nextWebcam.asObservable();
+  }
+
+  public async process() {
+    const fileUrl = await this.azureStorage.upload(
+      this._base64ToArrayBuffer(this.webcamImage.imageAsBase64)
+    );
+  }
+
+  private _base64ToArrayBuffer(base64: string) {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 }
